@@ -3,14 +3,14 @@ import requests
 import logging
 from logging.handlers import RotatingFileHandler
 
-log_format = logging.Formatter('%(asctime)s% - %(levelname)s% - %(message)s%')
+log_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 log_file = 'conn_log.log'
+logger = logging.getLogger(log_file)
+logger.setLevel(logging.INFO)
 log_handler = RotatingFileHandler(
     log_file, mode='a', maxBytes=1 * 1024 * 1024, backupCount=1, encoding='utf-8', delay=0)
 log_handler.setFormatter(log_format)
 log_handler.setLevel(logging.INFO)
-logger = logging.getLogger(log_file)
-logger.setLevel(logging.INFO)
 logger.addHandler(log_handler)
 
 AP_host = 'http://172.30.16.53'
@@ -20,24 +20,21 @@ def isconn():
     res = requests.get(AP_host + '/cgi-bin/rad_user_info')
     code = res.status_code
     content = res.content
-    isLogin =  True
+    isLogin = True
     if code is 200:
-        if  content != 'not_online':
-            #logger.info('online')
-            print 'online'
+        if content != 'not_online':
+            logger.info('online')
         else:
-            #logger.info('not online')
-            print 'not online'
+            logger.info('not online')
             isLogin = False
-
     else:
-        #logger.warn('server error')
+        logger.warn('server error')
         isLogin = False
     return isLogin
 
+
 def login():
-    #logger.info('正在拨号...')
-    print 'try login '
+    logger.info('try login')
     postData = {
         'action': 'login',
         'ac_id': 10,  # 10:request without mac
